@@ -82,7 +82,7 @@ for rec in json.load(sys.stdin)['result']:
                 log_out+="[$(date +%X)] - Active DNS rec IP addr == pub IP addr.\n"
                 stored_rec_ip=$rec_ip
             else
-                echo -e "Updating active & chached DNS record IP address..."
+                echo -e "Updating active & cached DNS record IP address..."
                 upd_rec=$(
                     curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$rec_id" \
                         -H "Authorization: Bearer $API_TOKEN" \
