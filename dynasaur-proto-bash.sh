@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-DATE_TIME=$(date +%F\ %X %:z)
-DATE_TIME_SHORT=$(date +%Y%m%d-%H%M%S-%z)
+DATE_TIME=$(date "+%F %X %z")
+DATE_TIME_SHORT=$(date "+%Y%m%d-%H%M%S-%z")
 
 LOG_FILE="$(pwd)/dynasaur-log--$DATE_TIME_SHORT.txt"
 PUB_IP_CMD="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -16,12 +16,11 @@ ZONE_ID="zone-id" # Configure this
 API_TOKEN="api-token" # Configure this
 
 
-echo -e "=============================="
+echo -e "===================================="
 echo -e "DYNASAUR ($DATE_TIME)"
-echo -e "=============================="
+echo -e "===================================="
 echo -e "\nRunning...\n"
 log_out="=== DYNASAUR ($DATE_TIME) ===\n"
-
 
 echo -e "Getting API token status..."
 token_ver=$(
@@ -42,7 +41,7 @@ then
     stored_rec_ip=""
 
     i=1
-    while [[ $i -le $NUM_CHECKS || $NUM_CHECKS == 0 ]]
+    while true
     do
         echo -e "\n=== CHECK #$i ($(date +%X)) ==="
         log_out+="[$(date +%X)] CHECK #$i\n"
@@ -100,18 +99,22 @@ for rec in json.load(sys.stdin)['result']:
         then
             echo -e "Saving log file..."
             echo -en "$log_out" >> "$LOG_FILE" && log_out=""
-            echo -e "Logs file saved."
+            echo -e "Log file saved."
         fi
 
-        echo -e "Awaiting next check..."
-        sleep $CHECK_DELAY
-        ((i++))
+        if [[ $NUM_CHECKS == 0 || $i -lt $NUM_CHECKS ]]
+        then
+            echo -e "Awaiting next check..."
+            sleep $CHECK_DELAY
+            ((i++))
+        else
+            break
+        fi
     done
 fi
 
 
 echo -e "\nDone!\n"
 
-echo -en "==============================" >> "$LOG_FILE" && log_out=""
-echo -e "=============================="
-
+echo -en "============================================" >> "$LOG_FILE" && log_out=""
+echo -e "====================================="
